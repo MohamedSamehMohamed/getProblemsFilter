@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flask Project</title>
+    <style>
+       body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            max-width: 70%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .form-group button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4caf50;
+            border: none;
+            color: #ffffff;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .form-group button:hover {
+            background-color: #45a049;
+        }
+      a {
+          text-decoration: none;
+      }
+      table {
+          border-collapse: collapse;
+          width: 100%;
+      }
+      th, td {
+          border: 1px solid black;
+          padding: 8px;
+      }
+      th {
+          background-color: #f2f2f2;
+      }
+      select {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    /* Style the selected option */
+    select option:checked {
+      background-color: #ccc;
+    }
+    .hidden-content {
+        display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Enter your handles and the rate of the problmes to get</h1>
+    <form method="post" action="{{ url_for('get_problems') }}">
+        <div class="form-group">
+            <label for="name">Handles: seperate multibe handles by a space </label>
+            <input type="text" id="handles" name="handles" value="{{handles}}" required>
+        </div>
+        <div class="form-group">
+            <label for="tags to include">Tags to Include </label>
+            <select id="includeTags" onchange="addItemToTextField('includeTagsDiv','includeTags', 'tags_to_include')">
+                <option value="">Select a tag</option>
+                {%for tag in tagList%}
+                    <option value="{{tag}}">{{tag}}</option>
+                {%endfor%}
+            </select>
+            <input type="text" id="tags_to_include" name="tags_to_include" readonly hidden>
+            <div style="overflow: auto;" id="includeTagsDiv"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="tags to exclude">Tags to exclude </label>
+            <select id="excludeTags" onchange="addItemToTextField('excludeTagsDiv','excludeTags', 'tags_to_exclude')">
+                <option value="">Select a tag</option>
+                {%for tag in tagList%}
+                    <option value="{{tag}}">{{tag}}</option>
+                {%endfor%}
+            </select>
+            <input type="text" id="tags_to_exclude" name="tags_to_exclude" readonly hidden>
+            <div style="overflow: auto;" id="excludeTagsDiv"></div>
+        </div>
+
+        <label for="rate">Rate:</label>
+        <div class="form-group">
+            <label for="rate">min Rate:</label>
+            <input type="text" id="min_rate" name="min_rate" value="{{min_rate}}" required>
+            <label for="rate">max Rate:</label>
+            <input type="text" id="max_rate" name="max_rate" value="{{max_rate}}" required>
+        </div>
+        <input type="number" name="page" value="1">
+        <div class="form-group">
+            <button type="submit">get problems</button>
+        </div>
+    </form>
+    {% if list %}
+        <h1>total number of problems {{list|length}}</h1>
+        <div class="form-group">
+            <button onclick="flip()">show | hide tags </button>
+        </div>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Tags</th>
+                <th>Rate</th>
+                <th>solved</th>
+            </tr>
+            {% for item in list %}
+                <tr>
+                    <td> <a href={{item['link']}} target="_blank">{{item['name']}}</a></td>
+                    <td class="tags">
+                        <div class="hidden-content">
+                        {% for tag in item['tags'] %}
+                            <span>{{tag}}</span>
+                        {% endfor %}
+                        </div>
+                    </td>
+                    <td>{{item['rate']}}</td>
+                    <td>{{item['solved_count']}}</td>
+                </tr>
+            {% endfor %}   
+        </table>
+  {% endif%}
+</div>
+<script>
+    function flip(){
+        var tds = document.getElementsByClassName('tags');
+        for (var i = 0; i < tds.length; i++){
+            var currentClass = tds[i].getElementsByTagName('div');
+            currentClass[0].className = (currentClass[0].className == ''? 'hidden-content': ''); 
+        }
+    }
+    function addDivToParent(parentDivId, value, createdDivId) {
+        var parentDiv = document.getElementById(parentDivId);
+        var existingDivs = parentDiv.getElementsByTagName('div');
+        var divFinalId = parentDivId + createdDivId;
+        for (var i = 0; i < existingDivs.length; i++){
+            if (existingDivs[i].id == divFinalId){
+                return;
+            }
+        }
+        var newDiv = document.createElement("div");
+        newDiv.id = divFinalId;
+
+        var newSpan = document.createElement("span");
+        newSpan.textContent = value;
+        var newImage = document.createElement("img");
+        newImage.src = "/images/close-10x10.png"; 
+        newImage.onclick   = () => {removeDiv(divFinalId);};
+        newDiv.appendChild(newSpan);
+        newDiv.appendChild(newImage);
+        parentDiv.appendChild(newDiv);
+    }
+    function removeDiv(id) {
+        var div = document.getElementById(id);
+        div.parentNode.removeChild(div);
+        getGroupValues();
+    }
+    function addItemToTextField(parentDivId, listId, textFieldId) {
+      var dropdown = document.getElementById(listId);
+      var selectedValue = dropdown.options[dropdown.selectedIndex].value;
+      addDivToParent(parentDivId, selectedValue, dropdown.selectedIndex);
+      getGroupValues(textFieldId, parentDivId);
+    }
+    function getGroupValues(textFieldId, parentDivId) {
+        var groupDiv = document.getElementById(parentDivId);
+        var textField = document.getElementById(textFieldId);
+        var spans = groupDiv.getElementsByTagName('span');
+        var values = [];
+        for (var i = 0; i < spans.length; i++) {
+            values.push(spans[i].textContent);
+        }
+        textField.value = values.join(',');
+    }
+  </script>
+</body>
+</html>
