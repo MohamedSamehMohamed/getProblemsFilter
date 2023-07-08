@@ -15,7 +15,7 @@ def get_problems():
     handles = handles_text.split(' ')
     min_rate = int(request.form['min_rate'])
     max_rate = int(request.form['max_rate'])
-    page = int(request.form['page'])
+    # page = int(request.form['page'])
     tags_to_include_text = request.form['tags_to_include']
     tags_to_exclude_text = request.form['tags_to_exclude']
     tags_to_include = tags_to_include_text.split(',')
