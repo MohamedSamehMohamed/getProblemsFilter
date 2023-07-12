@@ -43,6 +43,8 @@ def get_contests_bassed_on_div(divs_list):
             for contest in data["result"]:
                 name = contest["name"]
                 take = False
+                if len(divs_list) == 0:
+                    take = True
                 for div in divs_list:
                     if div in name:
                         take = True
