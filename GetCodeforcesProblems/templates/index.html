@@ -118,7 +118,19 @@
             <label for="rate">max Rate:</label>
             <input type="text" id="max_rate" name="max_rate" value="{{max_rate}}" required>
         </div>
-        <!-- <input type="number" name="page" value="1"> -->
+        
+        <div class="form-group">
+            <label for ="divs">Divs To Include</label>
+            <select id="divsToInclude" onchange="addItemToTextField('includeDivsDiv','divsToInclude', 'divs_to_include')">
+                <option value="">Select a tag</option>
+                <option value="Div. 1">Div. 1</option>
+                <option value="Div. 2">Div. 2</option>
+                <option value="Div. 3">Div. 3</option>
+                <option value="Div. 4">Div. 4</option>
+            </select>
+            <input type="text" id="divs_to_include" name="divs_to_include" readonly hidden>
+            <div style="overflow: auto;" id="includeDivsDiv"></div>
+        </div>
         <div class="form-group">
             <button type="submit">get problems</button>
         </div>
@@ -160,7 +172,7 @@
             currentClass[0].className = (currentClass[0].className == ''? 'hidden-content': ''); 
         }
     }
-    function addDivToParent(parentDivId, value, createdDivId) {
+    function addDivToParent(parentDivId, value, createdDivId, textFieldId) {
         var parentDiv = document.getElementById(parentDivId);
         var existingDivs = parentDiv.getElementsByTagName('div');
         var divFinalId = parentDivId + createdDivId;
@@ -176,20 +188,20 @@
         newSpan.textContent = value;
         var newImage = document.createElement("img");
         newImage.src = "/images/close-10x10.png"; 
-        newImage.onclick   = () => {removeDiv(divFinalId);};
+        newImage.onclick   = () => {removeDiv(divFinalId, textFieldId, parentDivId);};
         newDiv.appendChild(newSpan);
         newDiv.appendChild(newImage);
         parentDiv.appendChild(newDiv);
     }
-    function removeDiv(id) {
+    function removeDiv(id, textFieldId, parentDivId) {
         var div = document.getElementById(id);
         div.parentNode.removeChild(div);
-        getGroupValues();
+        getGroupValues(textFieldId, parentDivId);
     }
     function addItemToTextField(parentDivId, listId, textFieldId) {
       var dropdown = document.getElementById(listId);
       var selectedValue = dropdown.options[dropdown.selectedIndex].value;
-      addDivToParent(parentDivId, selectedValue, dropdown.selectedIndex);
+      addDivToParent(parentDivId, selectedValue, dropdown.selectedIndex, textFieldId);
       getGroupValues(textFieldId, parentDivId);
     }
     function getGroupValues(textFieldId, parentDivId) {

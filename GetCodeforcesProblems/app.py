@@ -20,12 +20,12 @@ def get_problems():
     tags_to_exclude_text = request.form['tags_to_exclude']
     tags_to_include = tags_to_include_text.split(',')
     tags_to_exclude = tags_to_exclude_text.split(',')
+    divs_to_include = request.form['divs_to_include'].split(',')
     if len(tags_to_include) == 1 and tags_to_include[0] == '':
         tags_to_include.clear()
     if len(tags_to_exclude) == 1 and tags_to_exclude[0] == '':
         tags_to_exclude.clear()
-        
-    list = get_unsolved_problems(handles, min_rate, max_rate, tags_to_include, tags_to_exclude)
+    list = get_unsolved_problems(handles, min_rate, max_rate, tags_to_include, tags_to_exclude, divs_to_include)
     tagList = read_file('tags')
     return render_template('index.html', handles = handles_text, min_rate = min_rate, max_rate = max_rate, tags_to_include_text = tags_to_include_text, tags_to_exclude_text = tags_to_exclude_text, tagList = tagList, list = list)
     

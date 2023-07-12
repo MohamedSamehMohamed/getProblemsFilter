@@ -33,7 +33,28 @@ def has_common_element(list1, list2):
     common_elements = set1.intersection(set2)
     return len(common_elements) > 0
 
-def get_unsolved_problems(user_handles, min_rate, max_rate, tags_to_include, tags_to_exclude):
+def get_contests_bassed_on_div(divs_list):
+    url = f"https://codeforces.com/api/contest.list"
+    contest_ids = [] 
+    try:
+        response = requests.get(url)
+        data = response.json()
+        if data["status"] == "OK":
+            for contest in data["result"]:
+                name = contest["name"]
+                take = False
+                for div in divs_list:
+                    if div in name:
+                        take = True
+                        break 
+                if take:
+                    contest_ids.append(contest["id"])
+            return contest_ids
+    except:
+        return contest_ids
+    
+def get_unsolved_problems(user_handles, min_rate, max_rate, tags_to_include, tags_to_exclude, divs_list):
+    contest_ids_to_include = get_contests_bassed_on_div(divs_list)
     solvedList = get_users_solved_problems(user_handles)
     url = f"https://codeforces.com/api/problemset.problems"
     unsolved_problems = []
@@ -53,6 +74,9 @@ def get_unsolved_problems(user_handles, min_rate, max_rate, tags_to_include, tag
                     continue
                 problem_rate = problem['rating']
                 problem_tags = problem['tags']
+                contest_id = problem["contestId"]
+                if contest_id not in contest_ids_to_include:
+                    continue
                 if problem_rate < min_rate or problem_rate > max_rate:
                     continue
                 if has_common_element(problem_tags, tags_to_exclude):
