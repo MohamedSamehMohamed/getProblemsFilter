@@ -53,7 +53,7 @@ def get_contests_bassed_on_div(divs_list):
     except:
         return contest_ids
     
-def get_unsolved_problems(user_handles, min_rate, max_rate, tags_to_include, tags_to_exclude, divs_list):
+def get_unsolved_problems(user_handles, min_rate, max_rate, tags_to_include, tags_to_exclude, divs_list, problem_index_to_include):
     contest_ids_to_include = get_contests_bassed_on_div(divs_list)
     solvedList = get_users_solved_problems(user_handles)
     url = f"https://codeforces.com/api/problemset.problems"
@@ -75,6 +75,9 @@ def get_unsolved_problems(user_handles, min_rate, max_rate, tags_to_include, tag
                 problem_rate = problem['rating']
                 problem_tags = problem['tags']
                 contest_id = problem["contestId"]
+                problem_index = str(problem["index"])
+                if len(problem_index_to_include) > 0 and problem_index not in problem_index_to_include:
+                    continue
                 if contest_id not in contest_ids_to_include:
                     continue
                 if problem_rate < min_rate or problem_rate > max_rate:
@@ -88,7 +91,7 @@ def get_unsolved_problems(user_handles, min_rate, max_rate, tags_to_include, tag
                 current_problem['rate'] = problem_rate
                 current_problem['tags'] = problem_tags
                 current_problem['link'] = 'https://codeforces.com/problemset/problem/' + str(problem['contestId']) + '/' + str(problem['index']) 
-                current_problem['name'] = problem['name']
+                current_problem['name'] = str(problem['contestId']) + str(problem['index']) + '  ' + problem['name']
                 current_problem['solved_count'] = solved_count
                 unsolved_problems.append(current_problem)
     except:

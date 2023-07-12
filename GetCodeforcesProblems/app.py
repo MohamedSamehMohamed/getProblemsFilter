@@ -21,11 +21,16 @@ def get_problems():
     tags_to_include = tags_to_include_text.split(',')
     tags_to_exclude = tags_to_exclude_text.split(',')
     divs_to_include = request.form['divs_to_include'].split(',')
+    problem_index_to_include_text = request.form['divs_to_include_Indexes'].split(',')
+    problem_index_to_include = ''
+    for index in problem_index_to_include_text:
+        problem_index_to_include += index
     if len(tags_to_include) == 1 and tags_to_include[0] == '':
         tags_to_include.clear()
     if len(tags_to_exclude) == 1 and tags_to_exclude[0] == '':
         tags_to_exclude.clear()
-    list = get_unsolved_problems(handles, min_rate, max_rate, tags_to_include, tags_to_exclude, divs_to_include)
+    
+    list = get_unsolved_problems(handles, min_rate, max_rate, tags_to_include, tags_to_exclude, divs_to_include, problem_index_to_include)
     tagList = read_file('tags')
     return render_template('index.html', handles = handles_text, min_rate = min_rate, max_rate = max_rate, tags_to_include_text = tags_to_include_text, tags_to_exclude_text = tags_to_exclude_text, tagList = tagList, list = list)
     
@@ -33,6 +38,11 @@ def get_problems():
 def index():
     tagList = read_file('tags')
     return render_template('index.html', tagList = tagList)
+
+
+@app.template_filter('get_character')
+def get_character(character_code):
+    return chr(character_code)
 
 if __name__ == '__main__':
     app.run(debug=True)
