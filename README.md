@@ -5,6 +5,8 @@ you can add some handles and get problems that they didn't solve.
 
 you can exclude some tags for example, if you want problems that don't require math to solve or any tag you choose.
 
+you can get probelms from specific div like only div.4 contests or div. 2 and div. 3
+
 ## How to use 
 in command line or terminal type 
 ``
