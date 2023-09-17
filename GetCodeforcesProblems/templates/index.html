@@ -114,9 +114,13 @@
         <label for="rate">Rate:</label>
         <div class="form-group">
             <label for="rate">min Rate:</label>
-            <input type="text" id="min_rate" name="min_rate" value="{{min_rate}}" required>
+            <input type="text" id="min_rate" name="min_rate">
             <label for="rate">max Rate:</label>
-            <input type="text" id="max_rate" name="max_rate" value="{{max_rate}}" required>
+            <input type="text" id="max_rate" name="max_rate">
+            <label for="rate">How many Problems:</label>
+            <input type="text" id="number_of_problems" name="number_of_problems">
+            <input type="text" id="problem_rate_description" name="problem_rate_description" readonly hidden>
+            <button type="button" onclick="add_problem_rate_description()">add</button>
         </div>
         
         <div class="form-group">
@@ -177,6 +181,41 @@
   {% endif%}
 </div>
 <script>
+    function is_empty(value){
+        if (value === "" || isNaN(value))
+            return true;
+        return false;
+    }
+    var addedValues = [];
+    function add_problem_rate_description(){
+        var current_min_rate = document.getElementsByName('min_rate')[0].value;
+        var current_max_rate = document.getElementsByName('max_rate')[0].value;
+        var current_count = document.getElementsByName('number_of_problems')[0].value;
+        // fix the input to match the requirements
+        if (is_empty(current_min_rate))
+            current_min_rate = 800;
+        if (is_empty(current_max_rate))
+            current_max_rate = 4000;
+        if (is_empty(current_count))
+            current_count = 1;
+        if (current_min_rate > current_max_rate){
+            [current_min_rate, current_max_rate] = [current_max_rate, current_min_rate];
+        }
+        if (current_count < 1)
+            current_count = 1;
+
+        var key = current_min_rate + ':' + current_max_rate + ':' + current_count;
+        if (addedValues.includes(key)){
+            return;
+        }
+        addedValues.push(key);
+
+        var problem_rate_description  = document.getElementsByName('problem_rate_description')[0];
+        if (problem_rate_description.value.length > 0)
+            problem_rate_description.value += ' ';
+        problem_rate_description.value +=
+            current_min_rate + ' ' + current_max_rate + ' ' + current_count;
+    }
     function flip(){
         var tds = document.getElementsByClassName('tags');
         for (var i = 0; i < tds.length; i++){

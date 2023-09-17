@@ -13,9 +13,14 @@ def get_image(filename):
 def get_problems():
     handles_text = request.form['handles']
     handles = handles_text.split(' ')
-    min_rate = int(request.form['min_rate'])
-    max_rate = int(request.form['max_rate'])
-    # page = int(request.form['page'])
+    problem_rate_description_text = request.form['problem_rate_description']
+    if len(problem_rate_description_text) == 0:
+        problem_rate_description_text = '1 2000 1'
+    problem_rate_description = problem_rate_description_text.split(' ')
+    # make sure the problem_rate_description contains a multiple of 3 [minRate maxRate count]
+    while len(problem_rate_description) % 3 != 0:
+        problem_rate_description.pop()
+
     tags_to_include_text = request.form['tags_to_include']
     tags_to_exclude_text = request.form['tags_to_exclude']
     tags_to_include = tags_to_include_text.split(',')
@@ -29,10 +34,29 @@ def get_problems():
         tags_to_include.clear()
     if len(tags_to_exclude) == 1 and tags_to_exclude[0] == '':
         tags_to_exclude.clear()
-    
-    list = get_unsolved_problems(handles, min_rate, max_rate, tags_to_include, tags_to_exclude, divs_to_include, problem_index_to_include)
+    list = []
+    index = 0
+    # get all the problems
+    all_problems = get_unsolved_problems(handles, -1, 9000, 9000, tags_to_include, tags_to_exclude, divs_to_include, problem_index_to_include)
+    print('all problems count : ', len(all_problems))
+    while index + 3 <= len(problem_rate_description):
+        min_rate = int(problem_rate_description[index])
+        max_rate = int(problem_rate_description[index+1])
+        count = int(problem_rate_description[index+2])
+        index += 3
+        current = []
+        for problem in all_problems:
+            if min_rate <= problem['rate'] <= max_rate:
+                current.append(problem)
+                if len(current) == count:
+                    break
+        print(min_rate, end=' ')
+        print(max_rate, end=' ')
+        print(count)
+        print(len(current))
+        list += current
     tagList = read_file('tags')
-    return render_template('index.html', handles = handles_text, min_rate = min_rate, max_rate = max_rate, tags_to_include_text = tags_to_include_text, tags_to_exclude_text = tags_to_exclude_text, tagList = tagList, list = list)
+    return render_template('index.html', handles = handles_text, tags_to_include_text = tags_to_include_text, tags_to_exclude_text=tags_to_exclude_text, tagList=tagList, list=list)
     
 @app.route('/')
 def index():
