@@ -54,7 +54,8 @@ def get_contests_bassed_on_div(divs_list):
             return contest_ids
     except:
         return contest_ids
-    
+
+
 def get_unsolved_problems(user_handles, min_rate, max_rate, count, tags_to_include, tags_to_exclude, divs_list, problem_index_to_include):
     contest_ids_to_include = get_contests_bassed_on_div(divs_list)
     solvedList = get_users_solved_problems(user_handles)
